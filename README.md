@@ -4,6 +4,7 @@
 
 * Krivenko Rostislav
 * Nurkhassimova Aruzhan
+* Rozhkov Kirill
 
 ## Technologies
 ### Frontend
