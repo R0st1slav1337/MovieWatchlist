@@ -40,6 +40,26 @@ def register_view(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            refresh_token = request.data["refresh"]
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+
+            return Response(
+                {'message': 'Successfully logged out'},
+                status=status.HTTP_205_RESET_CONTENT
+            )
+        except Exception:
+            return Response(
+                {'error': 'Invalid or expired token'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def games_list(request):
