@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 
 from rest_framework.decorators import api_view, permission_classes
@@ -9,8 +10,8 @@ from rest_framework import status
 
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import Game, Review
-from .serializers import GameSerializer, ReviewSerializer, RegisterSerializer
+from .models import Game, Review, Profile
+from .serializers import GameSerializer, ReviewSerializer, RegisterSerializer, ProfileSerializer
 
 @api_view(['POST'])
 def login_view(request):
@@ -103,3 +104,19 @@ class ReviewDetail(APIView):
             )
         review.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    
+@api_view(['GET'])
+def get_profile(request, username):
+    try:
+        user = User.objects.get(username=username)
+        profile = Profile.objects.get(user=user)
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    # Chek if user profile is private
+    if not profile.is_public and request.user != user:
+        return Response({'error': 'Profile is private'}, status=status.HTTP_403_FORBIDDEN)
+    
+    serializer = ProfileSerializer(profile)
+    return Response(serializer.data)
