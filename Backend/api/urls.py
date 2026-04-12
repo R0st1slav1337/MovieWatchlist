@@ -11,4 +11,5 @@ urlpatterns = [
     path('reviews/<int:pk>/', ReviewDetail.as_view()),
 
     path('profile/<str:username>/', get_profile),
+    path('profile/me/', MyProfileView.as_view()),
 ]
